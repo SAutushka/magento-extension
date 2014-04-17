@@ -26,17 +26,16 @@ class Jirafe_Analytics_Model_Data_Attempt extends Jirafe_Analytics_Model_Abstrac
         return $response;
     }
 
-    protected function _createErrorRecord($data)
+    protected function _configureErrorData($data)
     {
         $data['errors'] = isset($data['errors']) ? json_encode($data['errors']) : null;
         $data['error_type'] = isset($data['error_type']) ? $data['error_type'] : null;
-        $error = Mage::getModel('jirafe_analytics/data_error');
-        return $error;
+        return $data;
     }
 
     protected function _createAttemptRecord($created, $id)
     {
-        $attempt = new $this;
+        $attempt = Mage::getModel('jirafe_analytics/data_attempt');
         $attempt->setDataId($id);
         $attempt->setCreatedDt($created);
         $attempt->save();
@@ -62,7 +61,7 @@ class Jirafe_Analytics_Model_Data_Attempt extends Jirafe_Analytics_Model_Abstrac
      */
     protected function _processError($created, $batch)
     {
-        foreach ($batch as $_ => $data) {
+        foreach ($batch as $data) {
             if (!array_key_exists('data_id', $data)) {
                 Mage::helper('jirafe_analytics')->log('ERROR', __METHOD__, 'Batch has no data_id: skiping.');
                 continue;
@@ -93,10 +92,11 @@ class Jirafe_Analytics_Model_Data_Attempt extends Jirafe_Analytics_Model_Abstrac
             $attempt = $this->_createAttemptRecord($created, $data);
             $this->_updateDataRecord($id, $success, $created)
 
-                if (!$success) {
-                    $error = $this->_createErrorRecord($data);
-                    $error->add($data, $attempt->getId());
-                }
+            if (!$success) {
+                $data = $this->_configureErrorData($data);
+                $error = Mage::getModel('jirafe_analytics/data_error');
+                $error->add($data, $attempt->getId());
+            }
         }
         return true;
     }
@@ -108,7 +108,7 @@ class Jirafe_Analytics_Model_Data_Attempt extends Jirafe_Analytics_Model_Abstrac
      * @return boolean
      * @throws Exception if unable to save attempt to db
      */
-    public function add($attempt=null)
+    public function add($attempt = null)
     {
         try {
             if (!$attempt) {
