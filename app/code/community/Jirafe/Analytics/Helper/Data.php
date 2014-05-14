@@ -198,12 +198,15 @@ class Jirafe_Analytics_Helper_Data extends Mage_Core_Helper_Abstract
          * Set PHP nice value.
          * Lower numbers = lower priority
          */
-
-        if (is_numeric($procNice)) {
-            proc_nice($procNice);
-            if (Mage::getStoreConfig('jirafe_analytics/debug/logging')) {
-                $this->log('DEBUG', __METHOD__, 'proc_nice = ' . $procNice);
+        try {
+            if (is_numeric($procNice)) {
+                proc_nice($procNice);
+                if (Mage::getStoreConfig('jirafe_analytics/debug/logging')) {
+                    $this->log('DEBUG', __METHOD__, 'proc_nice = ' . $procNice);
+                }
             }
+        } catch (Exception $e) {
+            $this->log('ERROR', __METHOD__, $e->getMessage(), $e);
         }
     }
 
