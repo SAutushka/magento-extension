@@ -344,7 +344,7 @@ class Jirafe_Analytics_Model_Map extends Jirafe_Analytics_Model_Abstract
         try {
         if ( $element ) {
                 $count = $this->getCollection()
-                        ->addFieldToFilter( '`element`', $element )
+                        ->addFieldToFilter( 'element', $element )
                         ->getSize();
                 
                 return $count ? true : false;
@@ -370,8 +370,8 @@ class Jirafe_Analytics_Model_Map extends Jirafe_Analytics_Model_Abstract
         try {
             if ( $element && $key) {
                 $count = $this->getCollection()
-                ->addFieldToFilter( '`element`', $element )
-                ->addFieldToFilter( '`key`', $key )
+                ->addFieldToFilter( 'element', $element )
+                ->addFieldToFilter( 'key', $key )
                 ->getSize();
                 
                 return $count ? true : false;
@@ -420,8 +420,8 @@ class Jirafe_Analytics_Model_Map extends Jirafe_Analytics_Model_Abstract
         try {
             if ( $element && $key ) {
                 return $this->getCollection()
-                        ->addFieldToFilter( '`element`', $element )
-                        ->addFieldToFilter( '`key`', $key )
+                        ->addFieldToFilter( 'element', $element )
+                        ->addFieldToFilter( 'key', $key )
                         ->getFirstItem();
             } else {
                 return null;
