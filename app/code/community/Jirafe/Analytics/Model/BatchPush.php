@@ -48,7 +48,7 @@ class Jirafe_Analytics_Model_BatchPush extends Jirafe_Analytics_Model_Base
                 $this->resetTimer($maxTime);
                 $batchData->convertEventDataToBatchData(null, false, $callback);
             }
-            Mage::helper('jirafe_analytics')->log('DEBUG', __METHOD__, 'Stoping Batch Push Job');
+            Mage::helper('jirafe_analytics')->log('DEBUG', __METHOD__, 'Stopping Batch Push Job');
         }
         catch (Exception $e)
         {
