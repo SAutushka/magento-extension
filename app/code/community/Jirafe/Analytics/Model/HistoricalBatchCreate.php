@@ -39,7 +39,7 @@ class Jirafe_Analytics_Model_HistoricalBatchCreate extends Jirafe_Analytics_Mode
                     }
                 }
             }
-            Mage::helper('jirafe_analytics')->log('DEBUG', __METHOD__, 'Stoping Historical Data Conversion Job.');
+            Mage::helper('jirafe_analytics')->log('DEBUG', __METHOD__, 'Stopping Historical Data Conversion Job.');
         } catch (Exception $e) {
             Mage::helper('jirafe_analytics')->log('ERROR', __METHOD__, $e->getMessage(), $e);
         }
