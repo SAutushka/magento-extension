@@ -44,9 +44,9 @@ class Jirafe_Analytics_Model_Data extends Jirafe_Analytics_Model_Abstract
             return Mage::getModel('core/website')->getCollection()
                 ->addFieldToSelect(array('website_id'))
                 ->getSelect()
-                ->join( array('d'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data')), "`main_table`.`website_id` = `d`.`store_id`", array())
-                ->joinLeft( array('bd'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/batch_data')), "`d`.`id` = `bd`.`data_id`", array())
-                ->where('`d`.`completed_dt` is NULL')
+                ->join( array('d'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data')), "main_table.website_id = d.store_id", array())
+                ->joinLeft( array('bd'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/batch_data')), "d.id = bd.data_id", array())
+                ->where('d.completed_dt is NULL')
                 ->distinct(true)
                 ->query();
 
@@ -72,7 +72,7 @@ class Jirafe_Analytics_Model_Data extends Jirafe_Analytics_Model_Abstract
                     ->getCollection()
                     ->addFieldToSelect(array('type'))
                     ->getSelect()
-                    ->join( array('d'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data')), "`main_table`.`id` = `d`.`type_id` AND `d`.`json` is not null AND `d`.`store_id` = $websiteId",array())
+                    ->join( array('d'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data')), "main_table.id = d.type_id AND d.json is not null AND d.store_id = $websiteId",array())
                     ->where('d.completed_dt is NULL')
                     ->where('d.attempt_count < ?', $this->maxAttempts)
                     ->distinct(true)
@@ -102,17 +102,17 @@ class Jirafe_Analytics_Model_Data extends Jirafe_Analytics_Model_Abstract
                 $query = Mage::getModel('jirafe_analytics/data')
                     ->getCollection()
                     ->addFieldToSelect(array('json'))
-                    ->addFieldToFilter('`main_table`.`json`', array('neq' => ''))
-                    ->addFieldToFilter('`main_table`.`store_id`', array('eq' => $websiteId))
-                    ->addFieldToFilter('`main_table`.`attempt_count`', array('lt' => $this->maxAttempts));
+                    ->addFieldToFilter('main_table.json', array('neq' => ''))
+                    ->addFieldToFilter('main_table.store_id', array('eq' => $websiteId))
+                    ->addFieldToFilter('main_table.attempt_count', array('lt' => $this->maxAttempts));
                 if(!$historical) {
-                    $query = $query->addFieldToFilter('`main_table`.`historical`', array('neq' => '1'));
+                    $query = $query->addFieldToFilter('main_table.historical', array('neq' => '1'));
                 } else {
-                    $query = $query->addFieldToFilter('`main_table`.`historical`', array('eq' => '1'));
+                    $query = $query->addFieldToFilter('main_table.historical', array('eq' => '1'));
                 }
                 $query = $query->getSelect()
-                    ->join( array('dt'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data_type')), "`main_table`.`type_id` = `dt`.`id` AND `dt`.`id` = $typeId",array('dt.type'))
-                    ->where('`main_table`.`completed_dt` is NULL')
+                    ->join( array('dt'=>Mage::getSingleton('core/resource')->getTableName('jirafe_analytics/data_type')), "main_table.type_id = dt.id AND dt.id = $typeId",array('dt.type'))
+                    ->where('main_table.completed_dt is NULL')
                     ->columns('main_table.store_id as website_id')
                     ->query();
 
@@ -239,14 +239,14 @@ class Jirafe_Analytics_Model_Data extends Jirafe_Analytics_Model_Abstract
             if (intval($minutes) > 15) {
                 $resource = Mage::getSingleton('core/resource');
 
-                $result = $resource->getConnection('core_write')->query( sprintf("DELETE FROM %s WHERE `id` IN (SELECT `data_id` FROM %s) AND TIMESTAMPDIFF(MINUTE,`captured_dt`,'%s') > %d",
+                $result = $resource->getConnection('core_write')->query( sprintf("DELETE FROM %s WHERE id IN (SELECT data_id FROM %s) AND TIMESTAMPDIFF(MINUTE,captured_dt,'%s') > %d",
                     $resource->getTableName('jirafe_analytics/data'),
                     $resource->getTableName('jirafe_analytics/batch_data'),
                     Mage::helper('jirafe_analytics')->getCurrentDt(),
                     $minutes)
                 );
 
-                $result = $resource->getConnection('core_write')->query( sprintf("DELETE FROM %s WHERE TIMESTAMPDIFF(MINUTE,`completed_dt`,'%s') > %d",
+                $result = $resource->getConnection('core_write')->query( sprintf("DELETE FROM %s WHERE TIMESTAMPDIFF(MINUTE,completed_dt,'%s') > %d",
                     $resource->getTableName('jirafe_analytics/batch'),
                     Mage::helper('jirafe_analytics')->getCurrentDt(),
                     $minutes)
